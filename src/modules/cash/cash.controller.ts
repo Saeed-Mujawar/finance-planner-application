@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { CashService } from './cash.service';
-import { CreateCashDto } from './dto/CreateCashDto';
 import { JwtAuthGuard } from 'src/common/jwt-auth.guard';
+import { CreateCashDto } from 'src/common/dtos/CreateCashDto';
 
 @Controller('cash')
 @UseGuards(JwtAuthGuard)

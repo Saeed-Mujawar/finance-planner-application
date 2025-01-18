@@ -2,11 +2,11 @@ import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/commo
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.schema';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from '../../common/dtos/create-user.dto';
+import { UpdateUserDto } from '../../common/dtos/update-user.dto';
 import { FamilyService } from '../family/family.service';
 import { CashService } from '../cash/cash.service';
+import { ERROR_MESSAGES } from 'src/common/error.constants';
 
 @Injectable()
 export class UserService {
@@ -26,7 +26,7 @@ export class UserService {
 
   async findOne(userID: string): Promise<User> {
     const user = await this.userModel.findById(userID).exec();
-    if (!user) throw new NotFoundException(`User with ID ${userID} not found`);
+    if (!user) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
     return user;
   }
 
@@ -53,9 +53,6 @@ export class UserService {
     return { message: `User with email "${user.email}" deleted and removed from families`, userID };
   }
 
-  async verifyPassword(user: User, plainPassword: string): Promise<boolean> {
-    return bcrypt.compare(plainPassword, user.password);
-  }
 
   async updatePortfolioValue(userID: string, portfolioValue: number): Promise<void> {
     await this.userModel.updateOne({ _id: userID }, { $set: { portfolioValue } });

@@ -1,6 +1,6 @@
-import { Controller, Post, Body, Param, Get, NotFoundException, Delete, Put, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, NotFoundException, Delete, Put, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
 import { FamilyService } from './family.service';
-import { InviteFamilyMembersDto } from './dto/InviteFamilyMembersDto';
+import { InviteFamilyMembersDto } from '../../common/dtos/InviteFamilyMembersDto';
 import { JwtAuthGuard } from '../../common/jwt-auth.guard';
 
 @Controller('family')

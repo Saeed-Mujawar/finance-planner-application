@@ -1,8 +1,10 @@
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcryptjs';
-import { CreateUserDto } from 'src/modules/user/dto/create-user.dto';
-import { LoginUserDto } from 'src/modules/user/dto/login-user.dto';
+import { AuthErrors } from 'src/common/error.constants';
+import { PasswordService } from 'src/common/PasswordService';
+import { TokenService } from 'src/common/TokenService';
+import { CreateUserDto } from 'src/common/dtos/create-user.dto';
+import { LoginUserDto } from 'src/common/dtos/login-user.dto';
 import { User } from 'src/modules/user/user.schema';
 import { UserService } from 'src/modules/user/user.service';
 
@@ -11,6 +13,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
@@ -18,10 +21,10 @@ export class AuthService {
   
     const existingUser = await this.userService.findOneByEmail(email);
     if (existingUser) {
-      throw new BadRequestException('User with this email already exists');
+      throw new BadRequestException(AuthErrors.USER_ALREADY_EXISTS);
     }
   
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await PasswordService.hashPassword(password);
   
     const user = await this.userService.create({
       ...rest,
@@ -40,13 +43,13 @@ export class AuthService {
     const user = await this.userService.findOneByEmail(email);
     
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS);
     }
 
     // Compare passwords
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await PasswordService.validatePassword(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(AuthErrors.INVALID_CREDENTIALS);
     }
 
     return this.generateResponse(user);
@@ -54,7 +57,7 @@ export class AuthService {
 
   private generateJwt(user: User) {
     const payload = { sub: user.id, email: user.email };
-    return this.jwtService.sign(payload);
+    return this.tokenService.generateToken(payload);
   }
 
   private generateResponse(user: User) {

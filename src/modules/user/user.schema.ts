@@ -6,8 +6,7 @@ export const UserSchema = new Schema({
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  portfolioValue: { type: Number, default: 0 },
-  familyMembers: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+  portfolioValue: { type: Number, default: 0 }
 });
 
 export interface User extends Document {
@@ -16,5 +15,4 @@ export interface User extends Document {
   email: string;
   password: string;
   portfolioValue: number;
-  familyMembers: User[];
 }

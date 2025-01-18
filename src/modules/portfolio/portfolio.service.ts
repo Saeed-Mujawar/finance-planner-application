@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { CashService } from '../cash/cash.service'; // Assuming cash service is available
 import { FamilyService } from '../family/family.service';
@@ -7,9 +7,9 @@ import { FamilyService } from '../family/family.service';
 @Injectable()
 export class PortfolioService {
   constructor(
-    private readonly userService: UserService,
-    private readonly cashService: CashService,
-    private readonly familyService: FamilyService,
+    @Inject(forwardRef(() => UserService))private readonly userService: UserService,
+    @Inject(forwardRef(() => CashService)) private readonly cashService: CashService,
+    @Inject(forwardRef(() => FamilyService)) private readonly familyService: FamilyService,
   ) {}
 
   async calculateAggregatedBalance(adminUserID: string): Promise<{ totalPortfolioValue: number }> {
@@ -21,7 +21,7 @@ export class PortfolioService {
     const familyMembers = await this.familyService.getFamilyMembers(adminUserID);
 
     for (const familyMember of familyMembers) {
-      console.log(familyMember);
+      
       totalPortfolioValue += await this.calculateUserPortfolio(familyMember.memberID);
     }
 
@@ -32,5 +32,11 @@ export class PortfolioService {
     const cashValue = await this.cashService.calculateUserCashPortfolio(userID);
     return cashValue; // Add other module values if needed
   }
+
+  async updateUserPortfolio(userID: string): Promise<void> {
+    const totalPortfolioValue = await this.userService.calculateTotalPortfolioValue(userID);
+    await this.userService.updatePortfolioValue(userID, totalPortfolioValue);
+  }
+
 }
 

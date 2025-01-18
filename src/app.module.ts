@@ -5,8 +5,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { FamilyModule } from './modules/family/family.module';
 import { CashModule } from './modules/cash/cash.module';
-import { PortfolioService } from './modules/portfolio/portfolio.service';
-import { PortfolioController } from './modules/portfolio/portfolio.controller';
+import { PortfolioModule } from './modules/portfolio/portfolio.module';
 
 
 
@@ -23,9 +22,8 @@ import { PortfolioController } from './modules/portfolio/portfolio.controller';
       },
       inject: [ConfigService],  // Inject ConfigService to access environment variables
     }),
-    UserModule,AuthModule, FamilyModule, CashModule
+    UserModule, AuthModule, FamilyModule, CashModule, PortfolioModule
   ],
-  providers: [PortfolioService],
-  controllers: [PortfolioController],
+  
 })
 export class AppModule {}

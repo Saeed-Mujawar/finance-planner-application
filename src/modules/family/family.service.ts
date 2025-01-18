@@ -3,8 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Family } from './family.schema';
 import { UserService } from '../user/user.service';
-import { JwtService } from '@nestjs/jwt';
-import { InviteFamilyMembersDto } from './dto/InviteFamilyMembersDto';
+import { InviteFamilyMembersDto } from '../../common/dtos/InviteFamilyMembersDto';
 import { EmailService } from 'src/common/EmailService';
 import { TokenService } from 'src/common/TokenService';
 
@@ -13,7 +12,6 @@ export class FamilyService {
     
     constructor(
         @InjectModel('Family') private readonly familyModel: Model<Family>,
-        private readonly jwtService: JwtService,
         @Inject(forwardRef(() => UserService))
         private userService: UserService,
         private readonly emailService: EmailService,

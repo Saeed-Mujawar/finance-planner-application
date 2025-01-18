@@ -2,14 +2,16 @@ import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/commo
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Cash } from './cash.schema';
-import { CreateCashDto } from './dto/CreateCashDto';
 import { UserService } from '../user/user.service';
+import { PortfolioService } from '../portfolio/portfolio.service';
+import { CreateCashDto } from 'src/common/dtos/CreateCashDto';
 
 @Injectable()
 export class CashService {
   constructor(
     @InjectModel('Cash') private readonly cashModel: Model<Cash>,
     @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
+    private readonly portfolioService: PortfolioService,
   ) {}
 
   // Create or update a single cash record for a user
@@ -24,15 +26,9 @@ export class CashService {
     ).exec();
 
     // Update the user's portfolio value
-    await this.updateUserPortfolio(userID);
+    await this.portfolioService.updateUserPortfolio(userID);
 
     return cash;
-  }
-
-  // Method to update the user's portfolio value
-  private async updateUserPortfolio(userID: string): Promise<void> {
-    const totalPortfolioValue = await this.userService.calculateTotalPortfolioValue(userID);
-    await this.userService.updatePortfolioValue(userID, totalPortfolioValue);
   }
 
   // Get the cash record for a user
